@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - main
+    paths:
+      - "starter/backend/**"
   workflow_dispatch:
 
 env:
@@ -112,11 +114,14 @@ jobs:
             --region $AWS_REGION \
             --name ${{ vars.EKS_CLUSTER_NAME }}
 
-      - name: Deploy Backend to EKS
+      - name: Deploy backend to EKS
+        working-directory: starter/backend/k8s
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         run: |
-          kubectl set image deployment/backend \
+          kustomize edit set image \
             backend=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+
+          kustomize build | kubectl apply -f -
 
           kubectl rollout status deployment/backend

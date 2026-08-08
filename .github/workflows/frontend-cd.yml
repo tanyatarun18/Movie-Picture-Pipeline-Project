@@ -4,7 +4,14 @@ on:
   push:
     branches:
       - main
+    paths:
+      - "starter/frontend/**"
   workflow_dispatch:
+
+env:
+  AWS_REGION: ${{ vars.AWS_REGION }}
+  ECR_REPOSITORY: frontend
+  IMAGE_TAG: ${{ github.sha }}
 
 jobs:
   lint:
@@ -69,10 +76,6 @@ jobs:
       run:
         working-directory: starter/frontend
 
-    env:
-      ECR_REPOSITORY: frontend
-      IMAGE_TAG: latest
-
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -93,7 +96,7 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
-          aws-region: ${{ vars.AWS_REGION }}
+          aws-region: ${{ env.AWS_REGION }}
 
       - name: Login to Amazon ECR
         id: login-ecr
@@ -116,11 +119,17 @@ jobs:
       - name: Configure kubectl
         run: |
           aws eks update-kubeconfig \
-            --region ${{ vars.AWS_REGION }} \
+            --region $AWS_REGION \
             --name ${{ secrets.EKS_CLUSTER_NAME }}
 
-      - name: Deploy to EKS
+      - name: Deploy frontend to EKS
+        working-directory: starter/frontend/k8s
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         run: |
-          kubectl apply -k ./k8s
-          kubectl rollout restart deployment frontend
-          kubectl rollout status deployment frontend
+          kustomize edit set image \
+            frontend=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+
+          kustomize build | kubectl apply -f -
+
+          kubectl rollout status deployment/frontend
