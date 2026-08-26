@@ -9,9 +9,10 @@ on:
   workflow_dispatch:
 
 env:
-  AWS_REGION: ${{ vars.AWS_REGION }}
+  AWS_REGION: ${{ vars.AWS_REGION || secrets.AWS_REGION || 'us-east-1' }}
   ECR_REPOSITORY: frontend
   IMAGE_TAG: ${{ github.sha }}
+  EKS_CLUSTER_NAME: ${{ vars.EKS_CLUSTER_NAME || secrets.EKS_CLUSTER_NAME || 'cluster' }}
 
 jobs:
   lint:
@@ -80,6 +81,9 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
+      - name: Setup Kustomize
+        uses: imranismail/setup-kustomize@v3
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -107,7 +111,7 @@ jobs:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         run: |
           docker build \
-            --build-arg REACT_APP_MOVIE_API_URL=${{ secrets.REACT_APP_MOVIE_API_URL }} \
+            --build-arg REACT_APP_MOVIE_API_URL=${{ secrets.REACT_APP_MOVIE_API_URL || vars.REACT_APP_MOVIE_API_URL }} \
             -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
 
       - name: Push Docker Image
@@ -120,7 +124,7 @@ jobs:
         run: |
           aws eks update-kubeconfig \
             --region $AWS_REGION \
-            --name ${{ secrets.EKS_CLUSTER_NAME }}
+            --name $EKS_CLUSTER_NAME
 
       - name: Deploy frontend to EKS
         working-directory: starter/frontend/k8s
