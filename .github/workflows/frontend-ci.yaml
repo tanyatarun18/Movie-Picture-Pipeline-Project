@@ -82,7 +82,7 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Run tests
+      - name: Run the npm run test command
         run: CI=true npm test -- --watchAll=false
 
       - name: Build Docker image
