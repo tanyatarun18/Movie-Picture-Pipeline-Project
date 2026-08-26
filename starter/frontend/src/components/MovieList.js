@@ -6,8 +6,9 @@ function MovieList({ onMovieClick }) {
   const [movies, setMovies] = useState([]);
 
   useEffect(() => {
+    const apiUrl = process.env.REACT_APP_MOVIE_API_URL || 'http://acf4d3da80cbf43a0b5f651fad2a20af-803163676.us-east-1.elb.amazonaws.com';
     axios
-      .get(`${process.env.REACT_APP_MOVIE_API_URL}/movies`)
+      .get(`${apiUrl}/movies`)
       .then((response) => {
         console.log('API Response:', response.data);
 

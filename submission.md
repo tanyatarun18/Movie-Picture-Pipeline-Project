@@ -1,6 +1,6 @@
 # Movie Picture Pipeline CI/CD Project Submission
 
-**GitHub Repository Link:** [https://github.com/IntelliCoder-AI/Movie-Picture-Pipeline-Udacity-Project](https://github.com/IntelliCoder-AI/Movie-Picture-Pipeline-Udacity-Project)
+**GitHub Repository Link:** [https://github.com/tanyatarun18/Movie-Picture-Pipeline-Project](https://github.com/tanyatarun18/Movie-Picture-Pipeline-Project)
 
 For this project, I have successfully implemented both Continuous Integration and Continuous Deployment pipelines for the frontend and backend applications using GitHub Actions. 
 - The CI pipelines are configured to trigger correctly on pull requests, successfully running linting, testing, and container builds with appropriate dependencies. 
