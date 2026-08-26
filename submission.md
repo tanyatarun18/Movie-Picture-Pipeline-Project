@@ -10,7 +10,7 @@ For this project, I have successfully implemented both Continuous Integration an
 ## Frontend Deployment
 The frontend is deployed and accessible at:
 
-[Live Frontend URL](http://abc67a0b5bc5649028ebc80ee737fcdd-512655747.us-east-1.elb.amazonaws.com)
+[Live Frontend URL](http://abc67a0b5bc5649028ebc80ee737fcdd-512655747.us-east-1.elb.amazonaws.com/)
 
 
 ## Backend Deployment
