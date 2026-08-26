@@ -192,9 +192,10 @@ data "aws_ssm_parameter" "eks_ami_release_version" {
 }
 
 resource "aws_eks_node_group" "main" {
-  node_group_name = "udacity"
+  node_group_name = "udacity-nodes"
   cluster_name    = aws_eks_cluster.main.name
   version         = aws_eks_cluster.main.version
+  ami_type        = "AL2_x86_64"
   node_role_arn   = aws_iam_role.node_group.arn
   subnet_ids      = [var.enable_private == true ? aws_subnet.private_subnet.id : aws_subnet.public_subnet.id]
   release_version = nonsensitive(data.aws_ssm_parameter.eks_ami_release_version.value)

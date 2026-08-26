@@ -9,9 +9,10 @@ on:
   workflow_dispatch:
 
 env:
-  AWS_REGION: ${{ vars.AWS_REGION }}
-  ECR_REPOSITORY: movie-backend
+  AWS_REGION: ${{ vars.AWS_REGION || secrets.AWS_REGION || 'us-east-1' }}
+  ECR_REPOSITORY: backend
   IMAGE_TAG: ${{ github.sha }}
+  EKS_CLUSTER_NAME: ${{ vars.EKS_CLUSTER_NAME || secrets.EKS_CLUSTER_NAME || 'cluster' }}
 
 jobs:
   lint:
@@ -82,6 +83,9 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
+      - name: Setup Kustomize
+        uses: imranismail/setup-kustomize@v3
+
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -112,7 +116,7 @@ jobs:
         run: |
           aws eks update-kubeconfig \
             --region $AWS_REGION \
-            --name ${{ vars.EKS_CLUSTER_NAME }}
+            --name $EKS_CLUSTER_NAME
 
       - name: Deploy backend to EKS
         working-directory: starter/backend/k8s
